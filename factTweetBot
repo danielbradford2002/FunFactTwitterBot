@@ -1,0 +1,71 @@
+
+import tweepy
+import keysAndTokens
+import schedule
+import time 
+
+api_key = keysAndTokens.api_key
+api_secret = keysAndTokens.api_secret
+bearer_token= keysAndTokens.bearer_token
+access_token = keysAndTokens.access_token
+access_token_secret = keysAndTokens.access_token_secret
+
+def api():
+    auth = tweepy.OAuthHandler(api_key, api_secret)
+    auth.set_access_token(access_token, access_token_secret)
+    return tweepy.API(auth)
+
+def tweet(api: tweepy.API, message: str):
+    # if image_path:
+    #     api.update_status_with_media(message)
+    # else:
+    api.update_status(message)
+    print("Tweeted successfully!")
+
+import csv
+contents = []
+with open("funfacts.csv", 'r') as file:
+    csvreader = csv.reader(file)
+    for row in csvreader:
+        if row not in contents:
+            contents.append(row)
+
+#print(contents)
+# print(len(str(contents[1]))<260)
+
+
+def call_tweet(index):
+    fact = str(contents[index])
+    last_letter = len(fact)-2
+    factPortion = fact[2:last_letter]
+    oneMoreThanIndex = index +1
+    entireTweet = str("Daily Fun Fact #" + str(oneMoreThanIndex) +":\n" + factPortion)
+    lengthOfTweet = len(entireTweet)
+    print(lengthOfTweet<280)
+    if lengthOfTweet < 280: #making sure fact is under 260 characters, so it is not too long for a tweet 
+        
+        auth = tweepy.OAuthHandler(api_key, api_secret)
+        auth.set_access_token(access_token, access_token_secret)
+        x =  tweepy.API(auth)
+        print("The tweet is:\n" + entireTweet + "\nThe length is less than 280 chacters so I can post it.")
+        tweet(x, entireTweet) 
+    else:
+        print("length of tweet is " + lengthOfTweet + " which is more than 280, so go to the next tweet")
+        index = index +1
+        modified.append(1) #increasing modified's length by one
+        call_tweet(index)
+
+modified = [1,1,1,1,1,1,1,1]
+def tweet_something():
+    modified.append(1)
+    print(modified)
+    index = len(modified)
+    print(len(modified))
+    call_tweet(index)
+
+schedule.every(8).hours.do(tweet_something)
+while 1:
+    schedule.run_pending()
+    time.sleep(1)
+
+
